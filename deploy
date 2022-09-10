@@ -23,21 +23,15 @@ elif [[ $# -ne 0 ]]; then
 fi
 
 servers=(
-    ns1.grapheneos.org
-    0.ns2.grapheneos.org
-    1.ns2.grapheneos.org
-    2.ns2.grapheneos.org
+    ns1.staging.grapheneos.org
 )
 
 declare -A addresses=(
-    [ns1.grapheneos.org]="51.222.14.6 2607:5300:205:200::29e8"
-    [0.ns2.grapheneos.org]="198.98.53.141 198.251.90.93 2605:6400:10:102e:95bc:89ef:2e7f:49bb"
-    [1.ns2.grapheneos.org]="205.185.124.155 198.251.90.93 2605:6400:20:1c8f:a0c9:372d:482e:945b"
-    [2.ns2.grapheneos.org]="107.189.3.168 198.251.90.93 2605:6400:30:ec25:102c:af6d:5be:1eb8"
+    [ns1.staging.grapheneos.org]="198.98.56.238 2605:6400:10:c41:de92:c534:326a:711a"
 )
 
 # use YYYYMMDDSS SOA serial format
-old_serial=$(cat serial.txt 2>/dev/null || echo -n $(date -u +"%Y%m%d00"))
+old_serial=$(cat serial-staging.txt 2>/dev/null || echo -n $(date -u +"%Y%m%d00"))
 serial=$(date -u +"%Y%m%d")
 if [[ ${old_serial:0:8} = ${serial} ]]; then
     old_sequence=${old_serial:8:2}
@@ -49,7 +43,7 @@ else
 fi
 echo serial: $serial
 echo
-echo -n $serial > serial.txt
+echo -n $serial > serial-staging.txt
 
 for server in ${servers[@]}; do
     echo $server
@@ -72,7 +66,6 @@ for server in ${servers[@]}; do
 
     if (( reconfigure )); then
         ssh $remote 'systemctl daemon-reload && systemctl restart pdns'
-        sleep 5
     else
         ssh $remote pdns_control reload
     fi
